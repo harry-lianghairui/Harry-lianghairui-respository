@@ -1,0 +1,266 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration debug="true" scan="true">
+    
+    <!-- 用于记录第三方, 第二方依赖产生的日志文件 -->
+    <appender name="ROLL_FILE_ROOT" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_file_path}/hqweb_service_other.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_file_path}/hqweb_service_other_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%date [%file:%line][%level] - %msg%n</pattern>
+        </encoder>
+    </appender>
+
+    <appender name="ROLL_FILE_RETRANS" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_file_path}/hqweb_service_retrans.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_file_path}/hqweb_service_retrans_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%date [%file:%line] - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <appender name="ROLL_FILE_MQ" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_file_path}/hqweb_service_mq.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_file_path}/hqweb_service_mq_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%date [%file:%line] - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <!-- 用于记录当前项目源代码范围内产生的日志文件 -->
+    <appender name="ROLL_FILE_APP" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_file_path}/hqweb_service.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_file_path}/hqweb_service_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+         <encoder class="ch.qos.logback.core.encoder.LayoutWrappingEncoder">
+            <charset>UTF-8</charset>
+            <layout class="cn.huanju.edu100.hq.common.logger.EduPatternLayout">
+                <pattern>%date [%file:%line][%level] - %msg%n</pattern>
+            </layout>
+        </encoder>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%date [%file:%line] - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+	<!-- 用于记录一些表示存活态的日志 -->  
+	<appender name="ROLL_FILE_HEARTBEATLOGGER" class="ch.qos.logback.core.rolling.RollingFileAppender">
+		<file>${log_file_path}/hqweb_heartbeat.log</file>
+		<rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+			<fileNamePattern>${log_file_path}/hqweb_heartbeat_%d{yyyy-MM-dd}.log</fileNamePattern>
+			<maxHistory>30</maxHistory>
+		</rollingPolicy>
+		<encoder>
+			<charset>UTF-8</charset>
+			<pattern>%date - %msg%n</pattern>
+		</encoder>
+	</appender>
+	<appender name="ASYNC_ROLL_FILE_HEARTBEATLOGGER" class="ch.qos.logback.classic.AsyncAppender">
+       <appender-ref ref="ROLL_FILE_HEARTBEATLOGGER"/>
+    </appender>
+    
+    <appender name="DAEMON_MONITOR_FILE_APP" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_file_path}/daemon_monitor.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_file_path}/daemon_monitor_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%date [%file:%line] - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <appender name="ASYNC_ROLL_FILE_APP" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_file_path}/async.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_file_path}/async_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%date [%file:%line] - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <appender name="ROLL_FILE_MONITOR" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_file_path}/hqweb_monitor.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_file_path}/hqweb_monitor_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%date [%file:%line] [%level] - %msg%n</pattern>
+        </encoder>
+    </appender>
+<!--     <appender name="STDOUT" class="ch.qos.logback.core.ConsoleAppender">
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <Pattern>%d{yyyy-MM-dd HH:mm:ss.SSS} [%thread] %-5level %logger{36} - %msg%n
+            </Pattern>
+        </layout>
+    </appender> -->
+<!--     <logger name="java.sql" level="DEBUG" additivity="false">
+        <appender-ref ref="STDOUT"/>
+    </logger> -->
+    <appender name="ROLL_FILE_TRANFER_DATA" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_file_path}/hqweb_tranfer.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_file_path}/hqweb_tranfer_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%date [%file:%line] [%level] - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <appender name="ROLL_FILE_DB_OPERATE_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_file_path}/hqweb_db_operate.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_file_path}/hqweb_db_operate_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%date - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+    <appender name="ROLL_FILE_DEL_KNOWLEDGE_LOG" class="ch.qos.logback.core.rolling.RollingFileAppender">
+        <file>${log_file_path}/hqweb_del_klg.log</file>
+        <rollingPolicy class="ch.qos.logback.core.rolling.TimeBasedRollingPolicy">
+            <fileNamePattern>${log_file_path}/hqweb_del_klg_%d{yyyy-MM-dd}.log</fileNamePattern>
+            <maxHistory>30</maxHistory>
+        </rollingPolicy>
+        <encoder>
+            <charset>UTF-8</charset>
+            <pattern>%date - %msg%n</pattern>
+        </encoder>
+    </appender>
+    
+
+    <!-- JDK相关日志配置 -->
+    <logger name="com.sun" level="WARN" additivity="false">
+        <appender-ref ref="ROLL_FILE_ROOT" />
+    </logger>
+    <logger name="java" level="WARN" additivity="false">
+        <appender-ref ref="ROLL_FILE_ROOT" />
+    </logger>
+    <logger name="javax" level="WARN" additivity="false">
+        <appender-ref ref="ROLL_FILE_ROOT" />
+    </logger>
+    <logger name="sun" level="WARN" additivity="false">
+        <appender-ref ref="ROLL_FILE_ROOT" />
+    </logger>
+
+    <!-- 第三方依赖日志配置 -->
+<!--     <logger name="org.apache" level="WARN" additivity="false">
+        <appender-ref ref="ROLL_FILE_ROOT" />
+    </logger> -->
+    <logger name="net.sf" level="WARN" additivity="false">
+        <appender-ref ref="ROLL_FILE_ROOT" />
+    </logger>
+    <logger name="org.springframework" level="WARN" additivity="false">
+        <appender-ref ref="ROLL_FILE_ROOT" />
+    </logger>
+    <logger name="com.google" level="WARN" additivity="false">
+        <appender-ref ref="ROLL_FILE_ROOT" />
+    </logger>
+    <logger name="org.objectweb" level="WARN" additivity="false">
+        <appender-ref ref="ROLL_FILE_ROOT" />
+    </logger>
+    <logger name="org.joda" level="WARN" additivity="false">
+        <appender-ref ref="ROLL_FILE_ROOT" />
+    </logger>
+    <logger name="org.hibernate" level="WARN" additivity="false">
+        <appender-ref ref="ROLL_FILE_ROOT" />
+    </logger>
+    <logger name="org.jboss" level="WARN" additivity="false">
+        <appender-ref ref="ROLL_FILE_ROOT" />
+    </logger>
+    <logger name="org.codehaus" level="WARN" additivity="false">
+        <appender-ref ref="ROLL_FILE_ROOT" />
+    </logger>
+    <logger name="org.aopalliance" level="WARN" additivity="false">
+        <appender-ref ref="ROLL_FILE_ROOT" />
+    </logger>
+    <logger name="org.aspectj" level="WARN" additivity="false">
+        <appender-ref ref="ROLL_FILE_ROOT" />
+    </logger>
+    <logger name="com.mchange" level="WARN" additivity="false">
+        <appender-ref ref="ROLL_FILE_ROOT" />
+    </logger>
+    <logger name="com.mysql" level="WARN" additivity="false">
+        <appender-ref ref="ROLL_FILE_ROOT" />
+    </logger>
+    <logger name="org.gjt" level="WARN" additivity="false">
+        <appender-ref ref="ROLL_FILE_ROOT" />
+    </logger>
+    
+    <!-- udb应用日志 -->
+    <logger name="cn.huanju.edu100.mq" level="DEBUG" additivity="false">
+        <appender-ref ref="ROLL_FILE_MQ" />
+    </logger>
+    <logger name="cn.huanju" level="DEBUG">
+        <appender-ref ref="ROLL_FILE_APP" />
+    </logger>
+    <logger name="com.duowan.udb" level="INFO" additivity="false">
+        <appender-ref ref="ROLL_FILE_APP" />
+    </logger>
+    <logger name="cn.huanju.daoproxy" level="INFO" additivity="false">
+        <appender-ref ref="DAEMON_MONITOR_FILE_APP" />
+    </logger>
+    <logger name="cn.huanju.edusc.profile.service.impl.SyncServiceImpl" level="INFO" additivity="false">
+        <appender-ref ref="ASYNC_ROLL_FILE_APP" />
+    </logger>
+    <logger name="transferData" level="DEBUG" additivity="false">
+        <appender-ref ref="ROLL_FILE_TRANFER_DATA" />
+    </logger>
+    <logger name="dbOperate" level="DEBUG" additivity="false">
+        <appender-ref ref="ROLL_FILE_DB_OPERATE_LOG" />
+    </logger>
+    <logger name="delKlgLog" level="DEBUG" additivity="false">
+        <appender-ref ref="ROLL_FILE_DEL_KNOWLEDGE_LOG" />
+    </logger>
+    <logger name="cn.huanju.edu100.monitor" level="INFO" additivity="false">
+        <appender-ref ref="ROLL_FILE_MONITOR" />
+    </logger>
+
+<!-- 	<logger name="com.ibatis" level="DEBUG" />  
+	<logger name="com.ibatis.common.jdbc.SimpleDataSource" level="DEBUG" />  
+	<logger name="com.ibatis.common.jdbc.ScriptRunner" level="DEBUG" />  
+	<logger name="com.ibatis.sqlmap.engine.impl.SqlMapClientDelegate" level="DEBUG" />  
+	<logger name="java.sql.Connection" level="DEBUG" />  
+	<logger name="java.sql.Statement" level="DEBUG" />  
+	<logger name="java.sql.PreparedStatement" level="DEBUG" /> 
+    <logger name="cn.huanju.edu100.hq.common.persistence.interceptor" level="INFO" additivity="false">
+        <appender-ref ref="ROLL_FILE_APP" />
+    </logger> -->
+
+    <!-- 其他日志配置 -->
+   <!--  <root level="INFO">
+        <appender-ref ref="ROLL_FILE_APP" />
+    </root> -->
+    <logger name="HeartBeatLogger" level="INFO" additivity="false">
+     	<appender-ref ref="ASYNC_ROLL_FILE_HEARTBEATLOGGER" />
+    </logger>
+    
+    <logger name="RetransLessonResource" level="INFO" additivity="false">
+     	<appender-ref ref="ROLL_FILE_RETRANS" />
+    </logger>
+</configuration>

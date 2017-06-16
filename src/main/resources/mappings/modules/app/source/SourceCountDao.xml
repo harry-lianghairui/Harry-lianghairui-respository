@@ -1,0 +1,153 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.app.dao.source.SourceCountDao">
+    
+	<sql id="sourceCountColumns">
+		a.id AS "id",
+		a.source_id AS "sourceId",
+		a.click_count AS "clickCount",
+		a.in_download_count AS "inDownloadCount",
+		a.complete_count AS "completeCount",
+		a.open_count AS "openCount",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+		a.create_by AS "createBy.id",
+		a.update_by AS "updateBy.id",
+		a.ip AS "ip",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="sourceCountJoins">
+	</sql>
+    
+	<select id="get" resultType="SourceCount">
+		SELECT 
+			<include refid="sourceCountColumns"/>
+		FROM source_count a
+		<include refid="sourceCountJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SourceCount">
+		SELECT 
+			<include refid="sourceCountColumns"/>
+		FROM source_count a
+		<include refid="sourceCountJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="sourceId != null and sourceId != ''">
+				AND a.source_id = #{sourceId}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SourceCount">
+		SELECT 
+			<include refid="sourceCountColumns"/>
+		FROM source_count a
+		<include refid="sourceCountJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO source_count(
+			source_id,
+			<if test="type == 0">
+				click_count,
+			</if>
+			<if test="type == 1">
+				in_download_count,
+			</if>
+			<if test="type == 3">
+				complete_count,
+			</if>
+			<if test="type == 4">
+				open_count,
+			</if>
+			create_date,
+			update_date,
+			create_by,
+			update_by,
+			ip,
+			del_flag
+		) VALUES (
+			#{sourceId},
+			<if test="type == 0">
+				#{clickCount},
+			</if>
+			<if test="type == 1">
+				#{inDownloadCount},
+			</if>
+			<if test="type == 3">
+				#{completeCount},
+			</if>
+			<if test="type == 4">
+				#{openCount},
+			</if>
+			#{createDate},
+			#{updateDate},
+			#{createBy.id},
+			#{updateBy.id},
+			#{ip},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE source_count SET 	
+			source_id = #{sourceId},
+			click_count = #{clickCount},
+			in_download_count = #{inDownloadCount},
+			complete_count = #{completeCount},
+			open_count = #{openCount},
+			update_date = #{updateDate},
+			update_by = #{updateBy.id},
+			ip = #{ip}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="increaseSourceCount">
+		UPDATE source_count SET 	
+			<if test="type == 0">
+				click_count = click_count+1
+			</if>
+			<if test="type == 1">
+				in_download_count = in_download_count+1
+			</if>
+			<if test="type == 3">
+				complete_count = complete_count+1
+			</if>
+			<if test="type == 4">
+				open_count = open_count+1
+			</if>
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE source_count SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

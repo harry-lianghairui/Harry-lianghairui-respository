@@ -1,0 +1,2 @@
+2017-06-10 22:54:39,037 [DiskStorageFactory.java:172][WARN] - The index for data file ..\temp\jeesite\ehcache\active%0053essions%0043ache.data is out of date, probably due to an unclean shutdown. Deleting index file ..\temp\jeesite\ehcache\active%0053essions%0043ache.index
+2017-06-10 23:21:27,524 [DiskStorageFactory.java:172][WARN] - The index for data file ..\temp\jeesite\ehcache\active%0053essions%0043ache.data is out of date, probably due to an unclean shutdown. Deleting index file ..\temp\jeesite\ehcache\active%0053essions%0043ache.index

@@ -1,0 +1,150 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.app.dao.source.SourceConfigDao">
+    
+	<sql id="sourceConfigColumns">
+		a.id AS "id",
+		a.resource_id AS "resourceId",
+		a.name AS "name",
+		a.version AS "version",
+		a.p_name AS "pName",
+		a.file_size AS "fileSize",
+		a.url AS "url",
+		a.back_ground AS "backGround",
+		a.status AS "status",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+		a.create_by AS "createBy.id",
+		a.update_by AS "updateBy.id",
+		a.ip AS "ip",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<sql id="sourceConfigJoins">
+	</sql>
+    
+	<select id="get" resultType="SourceConfig">
+		SELECT 
+			<include refid="sourceConfigColumns"/>
+		FROM source_config a
+		<include refid="sourceConfigJoins"/>
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SourceConfig">
+		SELECT 
+			<include refid="sourceConfigColumns"/>
+		FROM source_config a
+		<include refid="sourceConfigJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="status != null and status != ''">
+				AND a.status = #{status}
+			</if>
+			<if test="resourceId != null and resourceId != ''">
+				AND a.resource_id = #{resourceId}
+			</if>
+			<if test="name != null and name != ''">
+				AND a.name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{name}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{name}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{name},'%')</if>
+			</if>
+			<if test="pName != null and pName != ''">
+				AND a.p_name LIKE 
+					<if test="dbName == 'oracle'">'%'||#{pName}||'%'</if>
+					<if test="dbName == 'mssql'">'%'+#{pName}+'%'</if>
+					<if test="dbName == 'mysql'">concat('%',#{pName},'%')</if>
+			</if>
+			<if test="version != null and version != ''">
+				AND a.version = #{version}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findAllList" resultType="SourceConfig">
+		SELECT 
+			<include refid="sourceConfigColumns"/>
+		FROM source_config a
+		<include refid="sourceConfigJoins"/>
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO source_config(
+			resource_id,
+			name,
+			version,
+			p_name,
+			file_size,
+			url,
+			back_ground,
+			status,
+			create_date,
+			update_date,
+			create_by,
+			update_by,
+			ip,
+			del_flag
+		) VALUES (
+			#{resourceId},
+			#{name},
+			#{version},
+			#{pName},
+			#{fileSize},
+			#{url},
+			#{backGround},
+			#{status},
+			#{createDate},
+			#{updateDate},
+			#{createBy.id},
+			#{updateBy.id},
+			#{ip},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE source_config SET 	
+			resource_id = #{resourceId},
+			name = #{name},
+			p_name = #{pName},
+			file_size = #{fileSize},
+			version = #{version},
+			url = #{url},
+			back_ground = #{backGround},
+			status = #{status},
+			update_date = #{updateDate},
+			update_by = #{updateBy.id},
+			ip = #{ip}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE source_config SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>

@@ -1,0 +1,188 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans.xsd 
+                        http://www.springframework.org/schema/tx 
+                        http://www.springframework.org/schema/tx/spring-tx.xsd
+                        http://www.springframework.org/schema/context 
+                        http://www.springframework.org/schema/context/spring-context.xsd">
+
+<!--     <context:component-scan base-package="com.cnblogs.yjmyzz.sharding"/>
+
+    <bean id="propertiesFactoryBean"
+          class="org.springframework.beans.factory.config.PropertiesFactoryBean">
+        <property name="locations">
+            <list>
+                <value>classpath:properties/jdbc.properties</value>
+            </list>
+        </property>
+    </bean> -->
+
+<!--     <context:property-placeholder properties-ref="propertiesFactoryBean" ignore-unresolvable="true"/> -->
+
+    <!--父数据源-->
+    <bean id="parentDataSource" class="com.alibaba.druid.pool.DruidDataSource" init-method="init"
+          destroy-method="close">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+        <property name="filters" value="stat"/>
+        <property name="maxActive" value="20"/>
+        <property name="initialSize" value="1"/>
+        <property name="maxWait" value="60000"/>
+        <property name="minIdle" value="1"/>
+        <property name="timeBetweenEvictionRunsMillis" value="3000"/>
+        <property name="minEvictableIdleTimeMillis" value="300000"/>
+        <property name="validationQuery" value="SELECT 'x'"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="testOnBorrow" value="false"/>
+        <property name="testOnReturn" value="false"/>
+        <property name="poolPreparedStatements" value="true"/>
+        <property name="maxPoolPreparedStatementPerConnectionSize" value="20"/>
+        <property name="connectionInitSqls" value="set names utf8mb4;"/>
+    </bean>
+
+    <!--数据源0-->
+    <bean id="ds_0" parent="parentDataSource">
+        <property name="driverClassName" value="${jdbc.driver}"/>
+        <property name="url" value="${jdbc.url}"/>
+        <property name="username" value="${jdbc.username}"/>
+        <property name="password" value="${jdbc.password}"/>
+    </bean>
+
+<!--     数据源1
+    <bean id="ds_1" parent="parentDataSource">
+        <property name="driverClassName" value="${jdbc-driver}"/>
+        <property name="url" value="${jdbc-url-1}"/>
+        <property name="username" value="${jdbc-user-1}"/>
+        <property name="password" value="${jdbc-password-1}"/>
+    </bean>
+
+    数据源2
+    <bean id="ds_2" parent="parentDataSource">
+        <property name="driverClassName" value="${jdbc-driver}"/>
+        <property name="url" value="${jdbc-url-2}"/>
+        <property name="username" value="${jdbc-user-2}"/>
+        <property name="password" value="${jdbc-password-2}"/>
+    </bean> -->
+
+    <!--真正使用的数据源-->
+    <bean id="dataSource2" class="com.dangdang.ddframe.rdb.sharding.api.rule.DataSourceRule">
+        <constructor-arg>
+            <map>
+                <entry key="ds_0" value-ref="ds_0"/>
+<!--                 <entry key="ds_1" value-ref="ds_1"/>
+                <entry key="ds_2" value-ref="ds_2"/> -->
+            </map>
+        </constructor-arg>
+    </bean>
+
+    <!--t_order的"分表"设置:分N个表 -->
+     <bean id="orderTableRule" class="com.dangdang.ddframe.rdb.sharding.api.rule.TableRule">
+        <constructor-arg value="user_buy" index="0"/>
+        <constructor-arg value="false" index="1"/>
+        <constructor-arg index="2">
+            <list>
+                <value>user_buy_0</value>
+                <value>user_buy_1</value>
+            </list>
+        </constructor-arg>
+        <constructor-arg index="3" ref="dataSource2"/>
+        <constructor-arg index="4">
+        	<list>
+        		<value>jeesite</value>
+        	</list>
+        </constructor-arg>
+        <constructor-arg index="5" ref="databaseShardingStrategy"/>
+        <constructor-arg index="6" ref="tableShardingStrategy"/>
+    </bean>
+<!--     <bean id="orderTableRule" class="com.dangdang.ddframe.rdb.sharding.api.rule.TableRule">
+    	<property name="logicTable" value="user_buy"></property>
+    	<property name="actualTables">
+    		<list>
+               	<value>user_buy_0</value>
+                <value>user_buy_1</value>
+    		</list>
+    	</property>
+    </bean> -->
+
+    <!--分库的sharding规则:按user_id分库 -->
+    <bean id="databaseShardingStrategy"
+          class="com.dangdang.ddframe.rdb.sharding.api.strategy.database.DatabaseShardingStrategy">
+        <constructor-arg index="0" value="uid"/>
+        <constructor-arg index="1">
+            <bean class="com.thinkgem.jeesite.common.sharding.SingleKeyModuloDatabaseShardingAlgorithm">
+                <!--dbount的值要跟上面dataSource的个数匹配-->
+                <property name="dbCount" value="1"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <!--分表的规则:按order_id分表-->
+    <bean id="tableShardingStrategy" class="com.dangdang.ddframe.rdb.sharding.api.strategy.table.TableShardingStrategy">
+        <constructor-arg index="0" value="uid"/>
+        <constructor-arg index="1">
+            <bean class="com.thinkgem.jeesite.common.sharding.SingleKeyModuloTableShardingAlgorithm">
+                <!--tableCount的值要跟上面t_order表设置的分表个数保持一致-->
+                <property name="tableCount" value="2"/>
+            </bean>
+        </constructor-arg>
+    </bean>
+
+    <!--sharding规则Bean-->
+    <bean id="shardingRule" class="com.dangdang.ddframe.rdb.sharding.api.rule.ShardingRule">
+        <constructor-arg index="0" ref="dataSource2"/>
+        <constructor-arg index="1">
+            <list>
+                <ref bean="orderTableRule"/>
+            </list>
+        </constructor-arg>
+        <constructor-arg index="2">
+ 	        <list>
+                <ref bean="bindingTableRule"/>
+            </list>
+        </constructor-arg>
+        <constructor-arg index="3" ref="databaseShardingStrategy"/>
+        <constructor-arg index="4" ref="tableShardingStrategy"/>
+    </bean>
+
+    <!--sharding数据源-->
+    <bean id="bindingTableRule" class="com.dangdang.ddframe.rdb.sharding.api.rule.BindingTableRule">
+        <constructor-arg index="0">
+            <list>
+                <ref bean="orderTableRule"/>
+            </list>
+        </constructor-arg>
+    </bean>
+    <bean id="shardingDataSource" class="com.dangdang.ddframe.rdb.sharding.api.ShardingDataSource">
+        <constructor-arg ref="shardingRule"/>
+    </bean>
+
+    <!--sharding事务管理器-->
+    <!--<bean id="transactionManager"-->
+          <!--class="org.springframework.jdbc.datasource.DataSourceTransactionManager">-->
+        <!--<property name="dataSource" ref="shardingDataSource"/>-->
+    <!--</bean>-->
+
+    <!--<tx:annotation-driven transaction-manager="transactionManager"/>-->
+
+    <!--mybatis配置-->
+    <bean id="sqlSessionFactory2" class="org.mybatis.spring.SqlSessionFactoryBean">
+        <property name="configLocation" value="classpath:/mybatis-config.xml"></property>
+        <property name="dataSource" ref="shardingDataSource"/>
+        <property name="mapperLocations" value="classpath:/mappings/modules/**/*.xml"/>
+     	<property name="typeAliasesPackage" value="com.thinkgem.jeesite" />
+        <!-- <property name="mapperLocations" value="classpath:/mappings/order/OrderMapper.xml"/> -->
+    </bean>
+
+    <bean id="mapperScannerConfigurer2" class="org.mybatis.spring.mapper.MapperScannerConfigurer">
+        <property name="basePackage" value="com.thinkgem.jeesite.modules.buy.dao.order"/>
+        <property name="sqlSessionFactoryBeanName" value="sqlSessionFactory2"/>
+        <property name="annotationClass" value="com.thinkgem.jeesite.common.persistence.annotation.MyBatisDao"/>
+    </bean>
+
+</beans>

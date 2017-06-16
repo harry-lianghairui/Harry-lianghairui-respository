@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN" "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.thinkgem.jeesite.modules.app.dao.source.SourceUserDao">
+    
+	<sql id="sourceUserColumns">
+		a.id AS "id",
+		a.source_id AS "sourceId",
+		a.user_id AS "userId",
+		a.type AS "type",
+		a.count AS "count",
+		a.create_date AS "createDate",
+		a.update_date AS "updateDate",
+		a.ip AS "ip",
+		a.del_flag AS "delFlag"
+	</sql>
+	
+	<select id="get" resultType="SourceUser">
+		SELECT 
+			<include refid="sourceUserColumns"/>
+		FROM source_user a
+		WHERE a.id = #{id}
+	</select>
+	
+	<select id="findList" resultType="SourceUser">
+		SELECT 
+			<include refid="sourceUserColumns"/>
+		FROM source_user a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+			<if test="id != null and id != ''">
+				AND a.id = #{id}
+			</if>
+			<if test="sourceId != null and sourceId != ''">
+				AND a.source_id = #{sourceId}
+			</if>
+			<if test="userId != null and userId != ''">
+				AND a.user_id LIKE 
+				<if test="dbName == 'oracle'">'%'||#{userId}||'%'</if>
+				<if test="dbName == 'mssql'">'%'+#{userId}+'%'</if>
+				<if test="dbName == 'mysql'">concat('%',#{userId},'%')</if>
+			</if>
+			<if test="type != null">
+				AND a.type = #{type}
+			</if>
+		</where>
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<select id="findGroupList" resultType="com.thinkgem.jeesite.modules.app.entity.source.DataCount">
+		SELECT 
+		DATE_FORMAT(create_date,'%Y-%m-%d') as day, source_id as sourceId,
+		type as type, count(0) as cnt
+		FROM source_user
+		<where>
+			del_flag = 0
+			<if test="sourceId != null and sourceId != ''">
+				AND source_id = #{sourceId}
+			</if>
+			<if test="beginTime != null">
+				AND create_date > #{beginTime} 
+			</if>
+			<if test="endTime != null">
+				AND <![CDATA[create_date < #{endTime}]]>
+			</if>
+			<if test="type != null">
+				AND type = #{type}
+			</if>
+		</where>
+		group by type, day, source_id
+	</select>
+	
+	<select id="findAllList" resultType="SourceUser">
+		SELECT 
+			<include refid="sourceUserColumns"/>
+		FROM source_user a
+		<where>
+			a.del_flag = #{DEL_FLAG_NORMAL}
+		</where>		
+		<choose>
+			<when test="page !=null and page.orderBy != null and page.orderBy != ''">
+				ORDER BY ${page.orderBy}
+			</when>
+			<otherwise>
+				ORDER BY a.update_date DESC
+			</otherwise>
+		</choose>
+	</select>
+	
+	<insert id="insert">
+		INSERT INTO source_user(
+			source_id,
+			user_id,
+			type,
+			count,
+			create_date,
+			update_date,
+			ip,
+			del_flag
+		) VALUES (
+			#{sourceId},
+			#{userId},
+			#{type},
+			#{count},
+			#{createDate},
+			#{updateDate},
+			#{ip},
+			#{delFlag}
+		)
+	</insert>
+	
+	<update id="update">
+		UPDATE source_user SET 	
+			count = count+1,
+			update_date = #{updateDate},
+			ip = #{ip}
+		WHERE id = #{id}
+	</update>
+	
+	<update id="delete">
+		UPDATE source_user SET 
+			del_flag = #{DEL_FLAG_DELETE}
+		WHERE id = #{id}
+	</update>
+	
+</mapper>
