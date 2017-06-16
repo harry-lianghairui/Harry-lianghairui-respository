@@ -116,6 +116,7 @@ public class SourceConfigController extends BaseController {
             }
             sourceConfig.setFileSize(fileSize);
         } catch (Exception e) {
+            
             logger.error("SourceConfigController.save get fileSizeFail:{}", e);
         }finally{
             IOUtils.close(urlcon);
